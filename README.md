@@ -15,8 +15,8 @@
 
 1. **Клонируйте проект:**
 ```bash
-git clone <your-repo>
-cd ocserv_docker
+git clone https://github.com/Danzercroft/ocserv-docker.git
+cd ocserv-docker
 ```
 
 2. **Подготовьте SSL сертификаты:**
@@ -230,16 +230,16 @@ vpn_start_time_seconds      - Время запуска сервера
 curl http://localhost:8000/metrics
 
 # Через Docker
-docker exec ocserv-vpn wget -q -O - http://localhost:8000/metrics
+docker exec ocserv-docker wget -q -O - http://localhost:8000/metrics
 ```
 
 ### Мониторинг логов:
 ```bash
 # Просмотр логов контейнера
-docker logs ocserv-vpn -f
+docker logs ocserv-docker -f
 
 # Системные логи OCServ
-docker exec ocserv-vpn tail -f /var/log/messages | grep ocserv
+docker exec ocserv-docker tail -f /var/log/messages | grep ocserv
 ```
 
 ### Интеграция с Prometheus:

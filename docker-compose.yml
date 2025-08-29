@@ -1,7 +1,7 @@
 services:
   ocserv:
     build: .
-    container_name: ocserv-vpn
+    container_name: ocserv-docker
     restart: unless-stopped
     
     # Привилегированный режим для настройки сети

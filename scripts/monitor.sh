@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Скрипт для мониторинга ocserv сервера
+# Скрипт для мониторинга ocserv-docker сервера
 
 set -e
 
-CONTAINER_NAME="ocserv-vpn"
+CONTAINER_NAME="ocserv-docker"
 
 # Функция для логирования
 log() {

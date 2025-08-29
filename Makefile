@@ -1,10 +1,10 @@
-# Makefile для управления ocserv Docker проектом
+# Makefile для управления ocserv-docker проектом
 
 .PHONY: help build start stop restart logs status users clean add-user remove-user metrics monitor
 
 # Переменные
-CONTAINER_NAME = ocserv-vpn
-IMAGE_NAME = ocserv_docker-ocserv
+CONTAINER_NAME = ocserv-docker
+IMAGE_NAME = ocserv-docker
 DOCKER_COMPOSE = docker-compose
 
 # Цель по умолчанию
@@ -17,19 +17,19 @@ build: ## Собрать Docker образ
 	$(DOCKER_COMPOSE) build --no-cache
 
 start: ## Запустить сервер
-	@echo "Запуск ocserv сервера..."
+	@echo "Запуск ocserv-docker сервера..."
 	$(DOCKER_COMPOSE) up -d
 
 stop: ## Остановить сервер
-	@echo "Остановка ocserv сервера..."
+	@echo "Остановка ocserv-docker сервера..."
 	$(DOCKER_COMPOSE) down
 
 restart: ## Перезапустить сервер
-	@echo "Перезапуск ocserv сервера..."
+	@echo "Перезапуск ocserv-docker сервера..."
 	$(DOCKER_COMPOSE) restart
 
 logs: ## Показать логи
-	@echo "Логи ocserv сервера:"
+	@echo "Логи ocserv-docker сервера:"
 	$(DOCKER_COMPOSE) logs -f
 
 status: ## Показать статус сервера
@@ -89,7 +89,7 @@ backup: ## Создать резервную копию конфигурации
 	@tar -czf backup-$(shell date +%Y%m%d_%H%M%S).tar.gz config/ scripts/ .env docker-compose.yml Dockerfile *.md
 
 setup: ## Первоначальная настройка
-	@echo "Первоначальная настройка ocserv..."
+	@echo "Первоначальная настройка ocserv-docker..."
 	@if [ ! -f .env ]; then cp .env.example .env; fi
 	@chmod +x scripts/*.sh
 	@mkdir -p certs
