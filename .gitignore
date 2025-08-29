@@ -1,0 +1,34 @@
+# Логи
+logs/
+*.log
+
+# Сертификаты (если используются собственные)
+certs/
+*.pem
+*.key
+*.crt
+
+# Временные файлы
+tmp/
+*.tmp
+*.swp
+*~
+
+# Docker
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backup файлы
+*.backup.*
+
+# Переменные окружения
+.env
+.env.local

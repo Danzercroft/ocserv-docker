@@ -1,0 +1,95 @@
+# OCServ Configuration Template
+# This file will be processed by entrypoint.sh to substitute environment variables
+
+# Основная конфигурация ocserv
+auth = "plain[passwd=/etc/ocserv/passwd]"
+tcp-port = ${VPN_TCP_PORT}
+udp-port = ${VPN_UDP_PORT}
+run-as-user = nobody
+run-as-group = daemon
+socket-file = /var/run/ocserv-socket
+
+# Сертификаты
+server-cert = ${VPN_SERVER_CERT}
+server-key = ${VPN_SERVER_KEY}
+
+ca-cert = ${VPN_CA_CERT}
+
+# Максимальное количество клиентов
+max-clients = ${VPN_MAX_CLIENTS}
+max-same-clients = ${VPN_MAX_SAME_CLIENTS}
+
+server-stats-reset-time = 604800
+
+# Время жизни сессии
+keepalive = ${VPN_KEEPALIVE}
+dpd = ${VPN_DPD}
+mobile-dpd = ${VPN_MOBILE_DPD}
+
+switch-to-tcp-timeout = 25
+try-mtu-discovery = true
+
+cert-user-oid = 0.9.2342.19200300.100.1.1
+
+no-compress-limit = 256
+
+auth-timeout = ${VPN_AUTH_TIMEOUT}
+
+min-reauth-time = ${VPN_MIN_REAUTH_TIME}
+
+max-ban-score = ${VPN_BAN_SCORE}
+
+ban-reset-time = ${VPN_BAN_RESET_TIME}
+
+cookie-timeout = ${VPN_COOKIE_TIMEOUT}
+
+deny-roaming = false
+
+rekey-time = ${VPN_REKEY_TIME}
+
+rekey-method = ssl
+
+predictable-ips = true
+
+# Сеть VPN
+ipv4-network = ${VPN_IPV4_NETWORK}
+ipv4-netmask = ${VPN_IPV4_NETMASK}
+ipv6-network = ${VPN_IPV6_NETWORK}
+ipv6-subnet-prefix = ${VPN_IPV6_PREFIX}
+
+tunnel-all-dns = ${VPN_TUNNEL_ALL_DNS}
+
+# DNS серверы
+dns = ${VPN_DNS1}
+dns = ${VPN_DNS2}
+
+ping-leases = false
+
+# Маршруты (будут добавлены динамически если заданы)
+# ROUTES_PLACEHOLDER
+
+# Скрипты подключения/отключения
+#connect-script = /usr/bin/ocserv-script
+#disconnect-script = /usr/bin/ocserv-script
+
+# Логирование
+use-occtl = true
+pid-file = /var/run/ocserv.pid
+log-level = ${VPN_LOG_LEVEL}
+device = vpns
+
+# Ограничения маршрутов (будут добавлены динамически если заданы)
+# NO_ROUTES_PLACEHOLDER
+
+# Отключение legacy SSL
+tls-priorities = "NORMAL:%SERVER_PRECEDENCE:%COMPAT:-RSA:-VERS-SSL3.0:-ARCFOUR-128"
+
+# Компрессия
+compression = ${VPN_COMPRESSION}
+
+# Try to be compatible with AnyConnect clients
+cisco-client-compat = ${VPN_CISCO_COMPAT}
+
+# Отключение использования UTI
+mobile-dpd = 1800
+stats-report-time = 360

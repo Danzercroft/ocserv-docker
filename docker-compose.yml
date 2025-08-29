@@ -1,0 +1,42 @@
+services:
+  ocserv:
+    build: .
+    container_name: ocserv-vpn
+    restart: unless-stopped
+    
+    # Привилегированный режим для настройки сети
+    privileged: true
+    
+    # Загрузка переменных окружения из .env файла
+    env_file:
+      - .env
+    
+    # Порты (используются переменные из .env)
+    ports:
+      - "${VPN_TCP_PORT:-443}:${VPN_TCP_PORT:-443}/tcp"
+      - "${VPN_UDP_PORT:-443}:${VPN_UDP_PORT:-443}/udp"
+      - "8000:8000"  # Official ocserv-exporter metrics endpoint
+    
+    # Тома для постоянного хранения данных
+    volumes:
+      - ./certs:/etc/ocserv/certs:ro
+    
+    # Настройки сети
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    
+    # Устройства
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    
+    # Sysctls для IP forwarding
+    sysctls:
+      - net.ipv4.ip_forward=1
+    
+    # Логирование
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
