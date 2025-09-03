@@ -25,17 +25,7 @@ nano .env
 make setup
 ```
 
-## 2. Создание пользователей
-
-```bash
-# Добавление пользователя интерактивно
-./scripts/add_user.sh username
-
-# Или через Makefile
-make add-user USER=username
-```
-
-## 3. Запуск сервера
+## 2. Запуск сервера
 
 ```bash
 # Сборка и запуск
@@ -71,30 +61,7 @@ sudo openconnect -u username your.server.com:443
 - Сервер: `your.server.com:443`
 - Использовать созданные логин/пароль
 
-## 6. Управление пользователями
-
-```bash
-# Добавить пользователя
-make add-user USER=newuser
-
-# Удалить пользователя
-make remove-user USER=olduser
-
-# Список пользователей
-cat config/passwd | cut -d: -f1
-```
-
-## 7. Мониторинг
-
-```bash
-# Мониторинг в реальном времени
-make monitor
-
-# Статистика
-make stats
-```
-
-## 8. Обслуживание
+## 6. Обслуживание
 
 ```bash
 # Перезапуск

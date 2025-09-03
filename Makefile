@@ -1,6 +1,6 @@
 # Makefile для управления ocserv-docker проектом
 
-.PHONY: help build start stop restart logs status users clean add-user remove-user metrics monitor
+.PHONY: help build start stop restart logs status users clean metrics
 
 # Переменные
 CONTAINER_NAME = ocserv-docker
@@ -50,22 +50,7 @@ metrics-raw: ## Показать все метрики (включая Go runtim
 	@echo "Все метрики с ocserv-exporter:"
 	@curl -s http://localhost:8000/metrics || echo "Экспортер метрик недоступен на порту 8000"
 
-monitor: ## Запустить мониторинг
-	@./scripts/monitor.sh
 
-add-user: ## Добавить пользователя (использование: make add-user USER=username)
-	@if [ -z "$(USER)" ]; then \
-		echo "Использование: make add-user USER=username"; \
-		exit 1; \
-	fi
-	@./scripts/add_user.sh $(USER)
-
-remove-user: ## Удалить пользователя (использование: make remove-user USER=username)
-	@if [ -z "$(USER)" ]; then \
-		echo "Использование: make remove-user USER=username"; \
-		exit 1; \
-	fi
-	@./scripts/remove_user.sh $(USER)
 
 clean: ## Очистить контейнеры и образы
 	@echo "Остановка и удаление контейнеров..."

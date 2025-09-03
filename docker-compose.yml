@@ -11,15 +11,24 @@ services:
     env_file:
       - .env
     
-    # Порты (используются переменные из .env)
+    # Порты
     ports:
-      - "${VPN_TCP_PORT:-443}:${VPN_TCP_PORT:-443}/tcp"
-      - "${VPN_UDP_PORT:-443}:${VPN_UDP_PORT:-443}/udp"
+      - "443:443/tcp"
+      - "443:443/udp"
       - "8000:8000"  # Official ocserv-exporter metrics endpoint
     
-    # Тома для постоянного хранения данных
-    volumes:
-      - ./certs:/etc/ocserv/certs:ro
+    # Конфигурации
+    configs:
+      - source: ocserv_config
+        target: /etc/ocserv/ocserv.conf
+        mode: 0644
+    
+    # Секреты
+    secrets:
+      - ocserv_passwd
+      - server_cert
+      - server_key
+      - ca_cert
     
     # Настройки сети
     cap_add:
@@ -40,3 +49,17 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+configs:
+  ocserv_config:
+    file: ./config/ocserv.conf
+
+secrets:
+  ocserv_passwd:
+    file: ./config/passwd
+  server_cert:
+    file: ./certs/server.crt
+  server_key:
+    file: ./certs/server.key
+  ca_cert:
+    file: ./certs/ca.crt

@@ -78,17 +78,9 @@ RUN wget https://gitlab.com/openconnect/ocserv/-/archive/master/ocserv-master.ta
     # Очистка build зависимостей \
     apk del .build-deps
 
-# Создание директорий
-RUN mkdir -p /etc/ocserv/certs
-
-# Копирование файлов конфигурации
-COPY config/ocserv.conf.template /etc/ocserv/ocserv.conf.template
-COPY config/passwd /etc/ocserv/passwd
+# Копирование entrypoint
 COPY scripts/entrypoint.sh /entrypoint.sh
-COPY scripts/metrics-exporter.sh /metrics-exporter.sh
-
-# Генерация самоподписанного сертификата и установка прав
-RUN chmod +x /entrypoint.sh /metrics-exporter.sh
+RUN chmod +x /entrypoint.sh
 
 # Точка входа
 ENTRYPOINT ["/entrypoint.sh"]
