@@ -9,6 +9,11 @@ log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
+# Переменные окружения для путей к сертификатам (с дефолтными значениями для Swarm)
+SERVER_CERT_PATH="${SERVER_CERT_PATH:-/run/secrets/server_cert}"
+SERVER_KEY_PATH="${SERVER_KEY_PATH:-/run/secrets/server_key}"
+PASSWD_PATH="${PASSWD_PATH:-/run/secrets/ocserv_passwd}"
+
 # Проверка и создание необходимых директорий
 log "Создание необходимых директорий..."
 mkdir -p /var/run
@@ -31,39 +36,39 @@ if [ ! -f /etc/ocserv/ocserv.conf ]; then
     exit 1
 fi
 
-log "Статическая конфигурация используется без модификаций (вариант 1)."
+log "Настройка путей сертификатов в конфигурации..."
+# Создаем копию конфига с подстановкой переменных
+cp /etc/ocserv/ocserv.conf /tmp/ocserv.conf
+sed -i "s|@SERVER_CERT_PATH@|$SERVER_CERT_PATH|g" /tmp/ocserv.conf
+sed -i "s|@SERVER_KEY_PATH@|$SERVER_KEY_PATH|g" /tmp/ocserv.conf
+sed -i "s|@PASSWD_PATH@|$PASSWD_PATH|g" /tmp/ocserv.conf
 
 # Проверка файла паролей (secret)
-if [ ! -f /run/secrets/ocserv_passwd ]; then
-    log "ОШИБКА: Secret с паролями /run/secrets/ocserv_passwd не найден!"
+if [ ! -f "$PASSWD_PATH" ]; then
+    log "ОШИБКА: Файл с паролями не найден: $PASSWD_PATH"
     exit 1
 fi
 
 # Проверка обязательных SSL сертификатов
-log "Проверка SSL сертификатов (secrets)..."
-if [ ! -f "/run/secrets/server_cert" ]; then
-    log "ОШИБКА: Secret server_cert не найден в /run/secrets/server_cert"
+log "Проверка SSL сертификатов..."
+if [ ! -f "$SERVER_CERT_PATH" ]; then
+    log "ОШИБКА: Сертификат сервера не найден: $SERVER_CERT_PATH"
     exit 1
 fi
-if [ ! -f "/run/secrets/server_key" ]; then
-    log "ОШИБКА: Secret server_key не найден в /run/secrets/server_key"
-    exit 1
-fi
-if [ ! -f "/run/secrets/ca_cert" ]; then
-    log "ОШИБКА: Secret ca_cert не найден в /run/secrets/ca_cert"
+if [ ! -f "$SERVER_KEY_PATH" ]; then
+    log "ОШИБКА: Приватный ключ сервера не найден: $SERVER_KEY_PATH"
     exit 1
 fi
 
 # Проверка прав доступа к сертификатам
-if [ ! -r "/run/secrets/server_cert" ] || [ ! -r "/run/secrets/server_key" ] || [ ! -r "/run/secrets/ca_cert" ]; then
-    log "ОШИБКА: Недостаточно прав для чтения secrets сертификатов"
+if [ ! -r "$SERVER_CERT_PATH" ] || [ ! -r "$SERVER_KEY_PATH" ]; then
+    log "ОШИБКА: Недостаточно прав для чтения сертификатов"
     exit 1
 fi
 
-log "SSL сертификаты (secrets) найдены и доступны:"
-log "  Сертификат сервера: /run/secrets/server_cert"
-log "  Приватный ключ: /run/secrets/server_key"
-log "  CA сертификат: /run/secrets/ca_cert"
+log "SSL сертификаты найдены и доступны:"
+log "  Сертификат сервера: $SERVER_CERT_PATH"
+log "  Приватный ключ: $SERVER_KEY_PATH"
 
 # Функция для остановки сервера
 cleanup() {
@@ -114,5 +119,5 @@ log "Запуск ocserv..."
 log "Конфигурация: /etc/ocserv/ocserv.conf"
 log "Порт: 443 (TCP/UDP)"
 
-# Запуск в foreground режиме
-exec ocserv --foreground --pid-file /var/run/ocserv.pid --config /etc/ocserv/ocserv.conf
+# Запуск в foreground режиме с обработанной конфигурацией
+exec ocserv --foreground --pid-file /var/run/ocserv.pid --config /tmp/ocserv.conf

@@ -28,7 +28,6 @@ services:
       - ocserv_passwd
       - server_cert
       - server_key
-      - ca_cert
     
     # Настройки сети
     cap_add:
@@ -61,5 +60,3 @@ secrets:
     file: ./certs/server.crt
   server_key:
     file: ./certs/server.key
-  ca_cert:
-    file: ./certs/ca.crt

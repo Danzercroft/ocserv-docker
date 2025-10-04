@@ -6,6 +6,8 @@
 - Реализована поддержка Docker Compose configs и secrets
 - Добавлен статический конфигурационный файл `ocserv.conf` с разумными значениями по умолчанию
 - Добавлена документация по использованию configs и secrets
+- Добавлены переменные окружения для настройки путей к сертификатам (SERVER_CERT_PATH, SERVER_KEY_PATH, PASSWD_PATH)
+- Удален CA сертификат из конфигурации (не требуется для работы)
 
 ### Changed
 - **BREAKING CHANGE**: Заменен шаблон `ocserv.conf.template` статическим файлом `ocserv.conf`
