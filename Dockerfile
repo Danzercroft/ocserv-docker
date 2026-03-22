@@ -7,8 +7,6 @@ FROM alpine:3.22.1
 
 # Установка зависимостей для сборки ocserv
 RUN apk add --no-cache --virtual .build-deps \
-    autoconf \
-    automake \
     build-base \
     curl \
     git \
@@ -22,7 +20,9 @@ RUN apk add --no-cache --virtual .build-deps \
     linux-headers \
     linux-pam-dev \
     lz4-dev \
+    meson \
     musl-dev \
+    ninja \
     pkgconfig \
     protobuf-c-dev \
     readline-dev \
@@ -55,22 +55,20 @@ WORKDIR /tmp
 RUN wget https://gitlab.com/openconnect/ocserv/-/archive/master/ocserv-master.tar.gz && \
     tar -xzf ocserv-master.tar.gz && \
     cd ocserv-master && \
-    autoreconf -fvi && \
-    ./configure \
+    meson setup build \
         --prefix=/usr \
         --sysconfdir=/etc \
-        --with-pam \
-        --with-gssapi \
-        --with-utmp \
-        --with-protobuf \
-        --enable-compression \
-        --disable-systemd && \
-    make -j$(nproc) && \
-    make install && \
+        -Dpam=enabled \
+        -Dgssapi=enabled \
+        -Dutmp=enabled \
+        -Dcompression=enabled \
+        -Dsystemd=disabled && \
+    ninja -C build && \
+    ninja -C build install && \
     cd / && \
     rm -rf /tmp/ocserv-master* && \
     # Скачивание официального ocserv-exporter от Criteo \
-    wget -O /tmp/ocserv-exporter.tar.gz https://github.com/criteo/ocserv-exporter/releases/download/v0.2.1/ocserv-exporter_0.2.1_linux_amd64.tar.gz && \
+    wget -O /tmp/ocserv-exporter.tar.gz https://github.com/criteo/ocserv-exporter/releases/download/v0.2.2/ocserv-exporter_0.2.2_linux_amd64.tar.gz && \
     tar -xzf /tmp/ocserv-exporter.tar.gz -C /tmp && \
     mv /tmp/ocserv-exporter /usr/local/bin/ocserv-exporter && \
     chmod +x /usr/local/bin/ocserv-exporter && \
