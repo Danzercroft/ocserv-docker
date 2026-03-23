@@ -119,5 +119,13 @@ log "Запуск ocserv..."
 log "Конфигурация: /etc/ocserv/ocserv.conf"
 log "Порт: 443 (TCP/UDP)"
 
+OCSERV_ARGS="--foreground --pid-file /var/run/ocserv.pid --config /tmp/ocserv.conf"
+
+if [ "${OCSERV_DEBUG:-false}" = "true" ] || [ -n "$OCSERV_DEBUG_LEVEL" ]; then
+    DEBUG_LEVEL="${OCSERV_DEBUG_LEVEL:-9999}"
+    log "Включено полное логирование (уровень отладки ${DEBUG_LEVEL})"
+    OCSERV_ARGS="$OCSERV_ARGS -d $DEBUG_LEVEL"
+fi
+
 # Запуск в foreground режиме с обработанной конфигурацией
-exec ocserv --foreground --pid-file /var/run/ocserv.pid --config /tmp/ocserv.conf
+exec ocserv $OCSERV_ARGS
