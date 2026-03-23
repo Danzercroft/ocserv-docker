@@ -64,6 +64,8 @@ RUN wget https://gitlab.com/openconnect/ocserv/-/archive/master/ocserv-master.ta
         -Dgssapi=enabled \
         -Dutmp=enabled \
         -Dcompression=enabled \
+        -Dseccomp=enabled \
+        -Dnamespaces=enabled \
         -Dsystemd=disabled && \
     ninja -C build && \
     ninja -C build install && \
