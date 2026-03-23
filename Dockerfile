@@ -16,6 +16,7 @@ RUN apk add --no-cache --virtual .build-deps \
     krb5-dev \
     libev-dev \
     libnl3-dev \
+    libseccomp-dev \
     libtool \
     linux-headers \
     linux-pam-dev \
@@ -37,6 +38,7 @@ RUN apk add --no-cache \
     krb5 \
     libev \
     libnl3 \
+    libseccomp \
     linux-pam \
     lz4-libs \
     protobuf-c \

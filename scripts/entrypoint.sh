@@ -97,7 +97,7 @@ start_metrics() {
     METRICS_PORT="${METRICS_PORT:-8000}"
     METRICS_INTERVAL="${METRICS_INTERVAL:-30}"
     if ! command -v ocserv-exporter >/dev/null 2>&1; then
-        log "ocserv-exporter не найден – метрики отключены"
+        log "ocserv-exporter не найден - метрики отключены"
         return 0
     fi
     (
