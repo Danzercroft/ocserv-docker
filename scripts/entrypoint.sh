@@ -23,9 +23,16 @@ if [ -f /proc/sys/net/ipv4/ip_forward ]; then
     log "IP forwarding ожидается включенным (установлено через docker sysctls). Пропуск ручной настройки."
     
     log "Настройка iptables NAT..."
-    iptables -t nat -A POSTROUTING -s 10.10.10.1/24 -o eth0 -j MASQUERADE || true
-    iptables -A FORWARD -s 10.10.10.1/24 -j ACCEPT || true
-    iptables -A FORWARD -d 10.10.10.1/24 -j ACCEPT || true
+    DEFAULT_IFACE=$(ip route | awk '/^default/ {print $5; exit}')
+    if [ -z "$DEFAULT_IFACE" ]; then
+        DEFAULT_IFACE="eth0"
+    fi
+    log "Используется интерфейс для NAT: $DEFAULT_IFACE"
+    
+    # Заменяем 10.10.10.1/24 на 10.10.10.0/24 (правильная запись подсети)
+    iptables -t nat -A POSTROUTING -s 10.10.10.0/24 -o "$DEFAULT_IFACE" -j MASQUERADE || true
+    iptables -A FORWARD -s 10.10.10.0/24 -j ACCEPT || true
+    iptables -A FORWARD -d 10.10.10.0/24 -j ACCEPT || true
 fi
 
 
