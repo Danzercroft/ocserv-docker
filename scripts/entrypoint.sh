@@ -22,6 +22,10 @@ mkdir -p /var/run
 if [ -f /proc/sys/net/ipv4/ip_forward ]; then
     log "IP forwarding ожидается включенным (установлено через docker sysctls). Пропуск ручной настройки."
     
+    log "Включение TCP BBR..."
+    sysctl -w net.core.default_qdisc=fq || true
+    sysctl -w net.ipv4.tcp_congestion_control=bbr || true
+    
     log "Настройка iptables NAT..."
     DEFAULT_IFACE=$(ip route | awk '/^default/ {print $5; exit}')
     if [ -z "$DEFAULT_IFACE" ]; then
