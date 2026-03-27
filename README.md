@@ -23,14 +23,13 @@ cd ocserv-docker
 ```bash
 # Поместите ваши сертификаты в директорию certs/
 cp your-server.crt certs/server.crt
-cp your-server.key certs/server.key  
-cp your-ca.crt certs/ca.crt
+cp your-server.key certs/server.key
 
 # Или создайте тестовые самоподписанные сертификаты
 cd certs && openssl genrsa -out server.key 3072
 openssl req -new -key server.key -out server.csr -subj "/CN=vpn.example.com"
 openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt
-cp server.crt ca.crt && rm server.csr && cd ..
+rm server.csr && cd ..
 ```
 
 3. **Настройте переменные окружения:**
@@ -67,10 +66,6 @@ docker-compose up -d
   - Secret: `/run/secrets/server_key`
   - Права доступа: 0600
 
-- **ca_cert**: CA сертификат (`./certs/ca.crt`)
-  - Secret: `/run/secrets/ca_cert`
-  - Права доступа: 0644
-
 ### Преимущества такого подхода
 - **Безопасность**: Секретные данные не копируются в образ Docker
 - **Простота**: Конфигурация использует разумные значения по умолчанию
@@ -87,7 +82,6 @@ docker-compose up -d
 | `ocserv_passwd` | `/run/secrets/ocserv_passwd` | Файл пользователей (auth) |
 | `server_cert` | `/run/secrets/server_cert` | Сертификат сервера |
 | `server_key` | `/run/secrets/server_key` | Приватный ключ |
-| `ca_cert` | `/run/secrets/ca_cert` | CA сертификат |
 
 Файл `ocserv.conf` обновлен для использования этих путей.
 
@@ -110,6 +104,14 @@ docker-compose up -d
 | `SERVER_CERT_PATH` | `/run/secrets/server_cert` | Путь к сертификату сервера |
 | `SERVER_KEY_PATH` | `/run/secrets/server_key` | Путь к приватному ключу |
 | `PASSWD_PATH` | `/run/secrets/ocserv_passwd` | Путь к файлу паролей |
+
+### Сеть и Отладка (опционально)
+
+| Переменная | По умолчанию | Описание |
+|------------|--------------|----------|
+| `OCSERV_IP_POOL` | `10.10.10.0/24` | IP Пул для клиентов, влияет на NAT iptables |
+| `OCSERV_DEBUG` | `false` | Включить расширенное логирование ocserv |
+| `OCSERV_DEBUG_LEVEL` | `9999` | Уровень отладки (если включен DEBUG) |
 
 ### Дополнительно
 
