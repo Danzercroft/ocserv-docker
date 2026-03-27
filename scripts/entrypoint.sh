@@ -13,6 +13,30 @@ log() {
 SERVER_CERT_PATH="${SERVER_CERT_PATH:-/run/secrets/server_cert}"
 SERVER_KEY_PATH="${SERVER_KEY_PATH:-/run/secrets/server_key}"
 PASSWD_PATH="${PASSWD_PATH:-/run/secrets/ocserv_passwd}"
+OCSERV_IP_POOL="${OCSERV_IP_POOL:-10.10.10.0/24}"
+
+# Извлекаем IP и префикс (CIDR)
+IPV4_NETWORK="${OCSERV_IP_POOL%/*}"
+CIDR="${OCSERV_IP_POOL#*/}"
+
+# Конвертация CIDR (частые значения) в маску подсети для ocserv.conf
+case "$CIDR" in
+    8)  IPV4_NETMASK="255.0.0.0" ;;
+    16) IPV4_NETMASK="255.255.0.0" ;;
+    22) IPV4_NETMASK="255.255.252.0" ;;
+    23) IPV4_NETMASK="255.255.254.0" ;;
+    24) IPV4_NETMASK="255.255.255.0" ;;
+    25) IPV4_NETMASK="255.255.255.128" ;;
+    26) IPV4_NETMASK="255.255.255.192" ;;
+    27) IPV4_NETMASK="255.255.255.224" ;;
+    28) IPV4_NETMASK="255.255.255.240" ;;
+    29) IPV4_NETMASK="255.255.255.248" ;;
+    30) IPV4_NETMASK="255.255.255.252" ;;
+    32) IPV4_NETMASK="255.255.255.255" ;;
+    *)  
+        log "ПРЕДУПРЕЖДЕНИЕ: Использована нестандартная или неподдерживаемая маска ($CIDR). Используется 255.255.255.0 по умолчанию."
+        IPV4_NETMASK="255.255.255.0" ;;
+esac
 
 # Проверка и создание необходимых директорий
 log "Создание необходимых директорий..."
@@ -33,10 +57,10 @@ if [ -f /proc/sys/net/ipv4/ip_forward ]; then
     fi
     log "Используется интерфейс для NAT: $DEFAULT_IFACE"
     
-    # Заменяем 10.10.10.1/24 на 10.10.10.0/24 (правильная запись подсети)
-    iptables -t nat -A POSTROUTING -s 10.10.10.0/24 -o "$DEFAULT_IFACE" -j MASQUERADE || true
-    iptables -A FORWARD -s 10.10.10.0/24 -j ACCEPT || true
-    iptables -A FORWARD -d 10.10.10.0/24 -j ACCEPT || true
+    # Настройка iptables с использованием переменной для IP-пула
+    iptables -t nat -A POSTROUTING -s "$OCSERV_IP_POOL" -o "$DEFAULT_IFACE" -j MASQUERADE || true
+    iptables -A FORWARD -s "$OCSERV_IP_POOL" -j ACCEPT || true
+    iptables -A FORWARD -d "$OCSERV_IP_POOL" -j ACCEPT || true
 fi
 
 
@@ -53,6 +77,8 @@ cp /etc/ocserv/ocserv.conf /tmp/ocserv.conf
 sed -i "s|@SERVER_CERT_PATH@|$SERVER_CERT_PATH|g" /tmp/ocserv.conf
 sed -i "s|@SERVER_KEY_PATH@|$SERVER_KEY_PATH|g" /tmp/ocserv.conf
 sed -i "s|@PASSWD_PATH@|$PASSWD_PATH|g" /tmp/ocserv.conf
+sed -i "s|@IPV4_NETWORK@|$IPV4_NETWORK|g" /tmp/ocserv.conf
+sed -i "s|@IPV4_NETMASK@|$IPV4_NETMASK|g" /tmp/ocserv.conf
 
 # Проверка файла паролей (secret)
 if [ ! -f "$PASSWD_PATH" ]; then
