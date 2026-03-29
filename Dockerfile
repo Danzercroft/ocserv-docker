@@ -2,7 +2,7 @@ FROM alpine:3.23.3
 
 # OCServ Docker Image - собран из исходного кода на Alpine Linux
 # Версия ocserv: 1.4.1 (релизная)
-# Базовый образ: Alpine Linux 3.22.3
+# Базовый образ: Alpine Linux 3.23.3
 # Все возможности включены: PAM, RADIUS, GSSAPI
 
 # Установка зависимостей для сборки ocserv
@@ -50,20 +50,19 @@ ENV OCSERV_VERSION=1.4.1
 WORKDIR /tmp
 
 # Скачивание и сборка ocserv из исходного кода
-RUN wget https://gitlab.com/openconnect/ocserv/-/archive/1.4.1/ocserv-1.4.1.tar.gz && \
-    tar -xzf ocserv-1.4.1.tar.gz && \
+RUN wget ftp://ftp.infradead.org/pub/ocserv/ocserv-1.4.1.tar.xz && \
+    tar -xf ocserv-1.4.1.tar.xz && \
     cd ocserv-1.4.1 && \
-    meson setup build \
+    ./configure \
         --prefix=/usr \
         --sysconfdir=/etc \
-        -Dpam=enabled \
-        -Dgssapi=enabled \
-        -Dutmp=enabled \
-        -Dseccomp=disabled \
-        -Dnamespaces=disabled \
-        -Dsystemd=disabled && \
-    ninja -C build && \
-    ninja -C build install && \
+        --with-pam \
+        --with-utmp \
+        --without-seccomp \
+        --without-namespaces \
+        --without-systemd && \
+    make && \
+    make install && \
     cd / && \
     rm -rf /tmp/ocserv-1.4.1* && \
     # Скачивание официального ocserv-exporter от Criteo \
