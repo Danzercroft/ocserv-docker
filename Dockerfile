@@ -1,9 +1,9 @@
-FROM alpine:3.22.1
+FROM alpine:3.23.3
 
 # OCServ Docker Image - собран из исходного кода на Alpine Linux
-# Версия ocserv: master (последняя разработческая)
-# Базовый образ: Alpine Linux 3.22.1
-# Все возможности включены: PAM, RADIUS, GSSAPI, компрессия
+# Версия ocserv: 1.4.1 (релизная)
+# Базовый образ: Alpine Linux 3.22.3
+# Все возможности включены: PAM, RADIUS, GSSAPI
 
 # Установка зависимостей для сборки ocserv
 RUN apk add --no-cache --virtual .build-deps \
@@ -16,11 +16,9 @@ RUN apk add --no-cache --virtual .build-deps \
     krb5-dev \
     libev-dev \
     libnl3-dev \
-    libseccomp-dev \
     libtool \
     linux-headers \
     linux-pam-dev \
-    lz4-dev \
     meson \
     musl-dev \
     ninja \
@@ -38,9 +36,7 @@ RUN apk add --no-cache \
     krb5 \
     libev \
     libnl3 \
-    libseccomp \
     linux-pam \
-    lz4-libs \
     protobuf-c \
     readline \
     talloc \
@@ -48,29 +44,28 @@ RUN apk add --no-cache \
     rsyslog
 
 # Версия ocserv для сборки
-ENV OCSERV_VERSION=master
+ENV OCSERV_VERSION=1.4.1
 
 # Создание рабочей директории для сборки
 WORKDIR /tmp
 
 # Скачивание и сборка ocserv из исходного кода
-RUN wget https://gitlab.com/openconnect/ocserv/-/archive/master/ocserv-master.tar.gz && \
-    tar -xzf ocserv-master.tar.gz && \
-    cd ocserv-master && \
+RUN wget https://gitlab.com/openconnect/ocserv/-/archive/1.4.1/ocserv-1.4.1.tar.gz && \
+    tar -xzf ocserv-1.4.1.tar.gz && \
+    cd ocserv-1.4.1 && \
     meson setup build \
         --prefix=/usr \
         --sysconfdir=/etc \
         -Dpam=enabled \
         -Dgssapi=enabled \
         -Dutmp=enabled \
-        -Dcompression=enabled \
-        -Dseccomp=enabled \
-        -Dnamespaces=enabled \
+        -Dseccomp=disabled \
+        -Dnamespaces=disabled \
         -Dsystemd=disabled && \
     ninja -C build && \
     ninja -C build install && \
     cd / && \
-    rm -rf /tmp/ocserv-master* && \
+    rm -rf /tmp/ocserv-1.4.1* && \
     # Скачивание официального ocserv-exporter от Criteo \
     wget -O /tmp/ocserv-exporter.tar.gz https://github.com/criteo/ocserv-exporter/releases/download/v0.2.2/ocserv-exporter_0.2.2_linux_amd64.tar.gz && \
     tar -xzf /tmp/ocserv-exporter.tar.gz -C /tmp && \
